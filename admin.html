@@ -3,45 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบจัดการการจองห้องเรียน (Admin) - อาคารเรียนรวม 80 ปี</title>
-  <!-- Tailwind CSS & FontAwesome -->
+  <title>ระบบตรวจสอบและอนุมัติการจองห้อง - อาคารเรียนรวม 80 ปี</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Chart.js สำหรับแสดงกราฟสถิติ -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <style>
-    body { font-family: 'Prompt', sans-serif; }
-  </style>
+  <style> body { font-family: 'Prompt', sans-serif; } </style>
 
   <script>
-    // 🔒 ตรวจสอบสิทธิ์การเข้าใช้งาน
     if (sessionStorage.getItem("isAdminLoggedIn") !== "true") {
-      alert("กรุณาเข้าสู่ระบบก่อนใช้งานหน้าสำหรับผู้ดูแล");
+      alert("กรุณาเข้าสู่ระบบก่อนใช้งาน");
       window.location.href = "login.html";
     }
   </script>
 </head>
 <body class="bg-slate-100 min-h-screen flex flex-col">
 
-  <!-- Admin Header -->
   <header class="bg-[#0f2c23] text-white px-6 py-4 flex flex-col md:flex-row justify-between items-center shadow-lg gap-3">
     <div class="flex items-center gap-3">
       <div class="bg-amber-500 p-2.5 rounded-lg text-slate-900 shadow">
         <i class="fa-solid fa-user-shield text-2xl"></i>
       </div>
       <div>
-        <h1 class="text-lg md:text-xl font-bold leading-tight">ระบบจัดการสำหรับผู้ดูแลระบบ (Admin Panel)</h1>
+        <h1 class="text-lg md:text-xl font-bold leading-tight">ระบบตรวจสอบและอนุมัติการจองห้อง</h1>
         <p class="text-xs md:text-sm text-gray-300">อาคารเรียนรวม 80 ปี มหาวิทยาลัยแม่โจ้</p>
       </div>
     </div>
     
-    <div class="flex items-center gap-3 text-xs md:text-sm">
+    <div class="flex items-center gap-3 text-xs md:text-sm flex-wrap justify-end">
       <div class="hidden sm:flex items-center gap-2 bg-emerald-950/80 border border-emerald-700/50 px-3 py-1.5 rounded-lg text-emerald-200">
         <i class="fa-solid fa-circle-user text-amber-400 text-base"></i>
-        <span>ผู้ใช้งาน: <strong id="adminNameDisplay" class="text-white">Admin</strong></span>
+        <span>ผู้ใช้งาน: <strong id="adminNameDisplay" class="text-white">Admin</strong> <span id="roleBadge" class="bg-amber-500 text-slate-900 font-bold px-2 py-0.5 rounded text-[10px] ml-1">ADMIN</span></span>
       </div>
 
       <a href="index.html" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-3 py-1.5 rounded-lg font-medium transition border border-emerald-600 flex items-center gap-1.5">
@@ -56,58 +50,41 @@
 
   <main class="max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6 flex-1">
     
-    <!-- 1. KPI Cards สรุปข้อมูลหลัก -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      
       <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
         <div>
-          <p class="text-xs font-semibold text-gray-500 mb-1">จำนวนคำขอทั้งหมด</p>
+          <p class="text-xs font-semibold text-gray-500 mb-1">คำขอทั้งหมด</p>
           <p id="kpiTotal" class="text-3xl font-bold text-gray-800">0</p>
-          <p class="text-[11px] text-indigo-600 font-medium mt-1"><i class="fa-solid fa-file-lines mr-1"></i>คำขอผ่านระบบออนไลน์</p>
         </div>
-        <div class="bg-indigo-50 p-3.5 rounded-2xl text-indigo-600">
-          <i class="fa-solid fa-file-invoice text-2xl"></i>
-        </div>
+        <div class="bg-indigo-50 p-3.5 rounded-2xl text-indigo-600"><i class="fa-solid fa-file-invoice text-2xl"></i></div>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
         <div>
-          <p class="text-xs font-semibold text-gray-500 mb-1">อนุมัติเรียบร้อย</p>
+          <p class="text-xs font-semibold text-gray-500 mb-1">รอการอนุมัติของคุณ</p>
+          <p id="kpiPendingRole" class="text-3xl font-bold text-amber-500">0</p>
+        </div>
+        <div class="bg-amber-50 p-3.5 rounded-2xl text-amber-500"><i class="fa-solid fa-clock-rotate-left text-2xl"></i></div>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
+        <div>
+          <p class="text-xs font-semibold text-gray-500 mb-1">อนุมัติสมบูรณ์แล้ว</p>
           <p id="kpiApproved" class="text-3xl font-bold text-emerald-600">0</p>
-          <p class="text-[11px] text-emerald-600 font-medium mt-1"><i class="fa-solid fa-circle-check mr-1"></i>พร้อมใช้งานตามปฏิทิน</p>
         </div>
-        <div class="bg-emerald-50 p-3.5 rounded-2xl text-emerald-600">
-          <i class="fa-solid fa-calendar-check text-2xl"></i>
-        </div>
+        <div class="bg-emerald-50 p-3.5 rounded-2xl text-emerald-600"><i class="fa-solid fa-calendar-check text-2xl"></i></div>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
         <div>
-          <p class="text-xs font-semibold text-gray-500 mb-1">รอดำเนินการ</p>
-          <p id="kpiPending" class="text-3xl font-bold text-amber-500">0</p>
-          <p class="text-[11px] text-amber-600 font-medium mt-1"><i class="fa-solid fa-spinner animate-spin mr-1"></i>รอเจ้าหน้าที่พิจารณา</p>
-        </div>
-        <div class="bg-amber-50 p-3.5 rounded-2xl text-amber-500">
-          <i class="fa-solid fa-clock-rotate-left text-2xl"></i>
-        </div>
-      </div>
-
-      <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
-        <div>
-          <p class="text-xs font-semibold text-gray-500 mb-1">จำนวนผู้ร่วมงานสะสม</p>
+          <p class="text-xs font-semibold text-gray-500 mb-1">ผู้ร่วมงานรวม</p>
           <p id="kpiAttendees" class="text-3xl font-bold text-purple-600">0</p>
-          <p class="text-[11px] text-purple-600 font-medium mt-1"><i class="fa-solid fa-users mr-1"></i>รวมจากคำขอใช้บริการ</p>
         </div>
-        <div class="bg-purple-50 p-3.5 rounded-2xl text-purple-600">
-          <i class="fa-solid fa-user-group text-2xl"></i>
-        </div>
+        <div class="bg-purple-50 p-3.5 rounded-2xl text-purple-600"><i class="fa-solid fa-user-group text-2xl"></i></div>
       </div>
-
     </div>
 
-    <!-- 2. Charts กราฟสถิติ -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      
       <div class="lg:col-span-7 bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
         <div>
           <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
@@ -131,26 +108,25 @@
           <canvas id="departmentShareChart"></canvas>
         </div>
       </div>
-
     </div>
 
-    <!-- 3. ตารางจัดการและอนุมัติคำขอ -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 space-y-4">
       
       <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b pb-4">
         <div>
           <h2 class="text-base md:text-lg font-bold text-gray-800 leading-snug flex items-center gap-2">
-            <i class="fa-solid fa-tasks text-emerald-700"></i> ตรวจสอบและแก้ไขสถานะคำขอจอง
+            <i class="fa-solid fa-tasks text-emerald-700"></i> รายการคำขอจองห้องเรียน
           </h2>
-          <p class="text-xs text-gray-500 mt-0.5">จัดการอนุมัติ/ปฏิเสธ/ลบ คำขอขอใช้งานห้องเรียนแบบ Real-time</p>
+          <p id="roleDescription" class="text-xs text-gray-500 mt-0.5">กำลังโหลดข้อมูลการอนุมัติ...</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
           <select id="statusFilter" onchange="applyFilters()" class="px-3 py-1.5 border rounded-lg text-xs bg-gray-50 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-            <option value="ALL">สถานะทั้งหมด</option>
-            <option value="รออนุมัติ">เฉพาะ "รออนุมัติ"</option>
-            <option value="อนุมัติ">เฉพาะ "อนุมัติ"</option>
-            <option value="ไม่อนุมัติ">เฉพาะ "ไม่อนุมัติ"</option>
+            <option value="ALL">ทุกสถานะ</option>
+            <option value="รออนุมัติ (Admin)">รออนุมัติ (Admin)</option>
+            <option value="รออนุมัติ (Header)">รออนุมัติ (Header)</option>
+            <option value="อนุมัติ">อนุมัติสมบูรณ์</option>
+            <option value="ไม่อนุมัติ">ไม่อนุมัติ</option>
           </select>
 
           <div class="relative w-full sm:w-64">
@@ -172,14 +148,14 @@
               <th class="py-3 px-3 font-medium whitespace-nowrap">ห้องเรียน</th>
               <th class="py-3 px-3 font-medium">วัตถุประสงค์ & ช่วงเวลา</th>
               <th class="py-3 px-3 font-medium">ผู้ติดต่อ / หน่วยงาน</th>
-              <th class="py-3 px-3 font-medium text-center whitespace-nowrap">สถานะ</th>
-              <th class="py-3 px-3 font-medium text-center whitespace-nowrap">จัดการสถานะ</th>
+              <th class="py-3 px-3 font-medium text-center whitespace-nowrap">สถานะปัจจุบัน</th>
+              <th class="py-3 px-3 font-medium text-center whitespace-nowrap">การดำเนินการ / จัดการ</th>
             </tr>
           </thead>
           <tbody id="adminTableBody" class="divide-y divide-gray-100 text-gray-700">
             <tr>
               <td colspan="6" class="text-center py-8 text-gray-400">
-                <i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังโหลดข้อมูลสำหรับผู้ดูแลระบบ...
+                <i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังโหลดข้อมูลคำขอ...
               </td>
             </tr>
           </tbody>
@@ -190,39 +166,129 @@
 
   </main>
 
+  <!-- Edit Modal -->
+  <div id="editModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100">
+      <div class="bg-[#0f2c23] text-white px-5 py-4 flex justify-between items-center">
+        <h3 class="font-bold text-base flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-amber-400"></i> แก้ไขข้อมูลรายการจอง</h3>
+        <button onclick="closeEditModal()" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form id="editForm" onsubmit="saveEditBooking(event)" class="p-5 space-y-3 text-xs md:text-sm">
+        <input type="hidden" id="editBookingId">
+        
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">รหัสการจอง</label>
+          <input type="text" id="displayBookingId" disabled class="w-full px-3 py-1.5 bg-gray-100 border rounded font-mono font-bold text-emerald-800">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">ห้องที่ขอใช้งาน</label>
+            <input type="text" id="editRoom" required class="w-full px-3 py-1.5 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">จำนวนผู้เข้าใช้งาน (คน)</label>
+            <input type="number" id="editAttendees" required class="w-full px-3 py-1.5 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">หน่วยงาน / ภาควิชา</label>
+          <input type="text" id="editDept" required class="w-full px-3 py-1.5 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">ชื่อผู้ติดต่อ</label>
+            <input type="text" id="editContactName" required class="w-full px-3 py-1.5 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">เบอร์โทรศัพท์</label>
+            <input type="text" id="editPhone" required class="w-full px-3 py-1.5 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">วัตถุประสงค์</label>
+          <textarea id="editPurpose" rows="2" required class="w-full px-3 py-1.5 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">เวลาเริ่มใช้งาน</label>
+            <input type="text" id="editStartTime" required class="w-full px-3 py-1.5 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">เวลาสิ้นสุดใช้งาน</label>
+            <input type="text" id="editEndTime" required class="w-full px-3 py-1.5 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t flex justify-end gap-2">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg">ยกเลิก</button>
+          <button type="submit" id="saveEditBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow">บันทึกข้อมูล</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="bg-[#0f2c23] text-gray-300 text-xs py-6 mt-auto border-t border-emerald-900">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
+      <div>
+        <p class="font-semibold text-white text-sm">ระบบจัดการสำหรับผู้ดูแลระบบ (Admin Panel)</p>
+        <p class="text-gray-400 mt-0.5">อาคารเรียนรวม 80 ปี มหาวิทยาลัยแม่โจ้</p>
+      </div>
+      <div class="text-gray-400 sm:text-right">
+        <p>&copy; 2026 80th Anniversary Building. All rights reserved.</p>
+        <p class="mt-0.5 text-[11px] text-emerald-400">ระบบบริหารจัดการห้องเรียนอัจฉริยะ | <span class="font-medium">Developed by blackdragx_</span></p>
+      </div>
+    </div>
+  </footer>
+
   <script>
-    const SHEETDB_API_URL = "https://sheetdb.io/api/v1/7rirkbi9k7jjc";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzWpTA19Njd637bGpV16qoVPoAAxuZtkKD9LzqVpPyRk6vBd2HFdGKPH4-jFNrXbUW7/exec";
     
     let rawAdminData = [];
     let popularChartInstance = null;
     let departmentChartInstance = null;
+    const userRole = sessionStorage.getItem("userRole") || "admin";
 
     document.addEventListener("DOMContentLoaded", function() {
-      const adminName = sessionStorage.getItem("adminUser");
-      if (adminName) {
-        document.getElementById("adminNameDisplay").innerText = adminName;
-      }
+      const adminName = sessionStorage.getItem("adminUser") || "ผู้ใช้งาน";
+      document.getElementById("adminNameDisplay").innerText = adminName;
+      document.getElementById("roleBadge").innerText = userRole.toUpperCase();
+
+      const roleDesc = userRole === "admin" 
+        ? "แสดงสิทธิ์ Admin: ตรวจสอบและอนุมัติขั้นที่ 1 ก่อนส่งต่อให้ Header" 
+        : "แสดงสิทธิ์ Header: ตรวจสอบและอนุมัติขั้นสุดท้ายจากรายการที่ Admin อนุมัติแล้ว";
+      document.getElementById("roleDescription").innerText = roleDesc;
+
       loadAdminData();
     });
 
     function logout() {
       if (confirm("คุณต้องการออกจากระบบหรือไม่?")) {
         sessionStorage.clear();
-        window.location.href = "login.html";
+        window.location.href = "index.html"; // แก้ไขให้พากลับหน้า Index.html
       }
+    }
+
+    function getValue(item, keys, fallback = "-") {
+      for (const k of keys) {
+        if (item[k] !== undefined && item[k] !== null && String(item[k]).trim() !== "") {
+          return item[k];
+        }
+      }
+      return fallback;
     }
 
     async function loadAdminData() {
       const tbody = document.getElementById('adminTableBody');
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" class="text-center py-8 text-gray-400">
-            <i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังโหลดข้อมูลล่าสุด...
-          </td>
-        </tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-gray-400"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังโหลดข้อมูลล่าสุด...</td></tr>`;
 
       try {
-        const response = await fetch(SHEETDB_API_URL);
+        const response = await fetch(API_URL);
         const data = await response.json();
 
         if (Array.isArray(data) && data.length > 0) {
@@ -240,21 +306,27 @@
 
     function updateKPIs(data) {
       let approvedCount = 0;
-      let pendingCount = 0;
+      let pendingRoleCount = 0;
       let totalAttendees = 0;
 
       data.forEach(item => {
-        const status = item["สถานะ"] || "รออนุมัติ";
+        const status = String(getValue(item, ["สถานะ"], "รออนุมัติ")).trim();
+        
         if (status === "อนุมัติ") approvedCount++;
-        if (status === "รออนุมัติ") pendingCount++;
 
-        const attendees = parseInt(item["จำนวนผู้เข้าใช้งาน"]) || 0;
-        totalAttendees += attendees;
+        if (userRole === "admin" && (status === "รออนุมัติ (Admin)" || status === "รออนุมัติ")) {
+          pendingRoleCount++;
+        } else if (userRole === "header" && status === "รออนุมัติ (Header)") {
+          pendingRoleCount++;
+        }
+
+        const attendeesVal = parseInt(getValue(item, ["จำนวนผู้เข้าใช้งาน", "จำนวนผู้เข้าร่วม"], 0));
+        if (!isNaN(attendeesVal)) totalAttendees += attendeesVal;
       });
 
       document.getElementById('kpiTotal').innerText = data.length.toLocaleString();
       document.getElementById('kpiApproved').innerText = approvedCount.toLocaleString();
-      document.getElementById('kpiPending').innerText = pendingCount.toLocaleString();
+      document.getElementById('kpiPendingRole').innerText = pendingRoleCount.toLocaleString();
       document.getElementById('kpiAttendees').innerText = totalAttendees.toLocaleString();
     }
 
@@ -263,8 +335,8 @@
       const deptCounts = {};
 
       data.forEach(item => {
-        const room = item["ห้องที่ขอใช้งาน"] || "ไม่ระบุ";
-        const dept = item["หน่วยงาน / ภาควิชา"] || "อื่นๆ";
+        const room = getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"], "ไม่ระบุ");
+        const dept = getValue(item, ["หน่วยงาน / ภาควิชา", "หน่วยงาน"], "อื่นๆ");
 
         roomCounts[room] = (roomCounts[room] || 0) + 1;
         deptCounts[dept] = (deptCounts[dept] || 0) + 1;
@@ -321,13 +393,21 @@
       const keyword = document.getElementById('adminSearchInput').value.trim().toLowerCase();
 
       const filtered = rawAdminData.filter(item => {
-        const status = item["สถานะ"] || "รออนุมัติ";
-        const matchStatus = (statusFilter === 'ALL') || (status === statusFilter);
+        const status = getValue(item, ["สถานะ"], "รออนุมัติ");
+        
+        let matchStatus = false;
+        if (statusFilter === 'ALL') {
+          matchStatus = true;
+        } else if (statusFilter === 'รออนุมัติ (Admin)' && (status === 'รออนุมัติ (Admin)' || status === 'รออนุมัติ')) {
+          matchStatus = true;
+        } else if (status === statusFilter) {
+          matchStatus = true;
+        }
 
-        const bookingId = String(item["รหัสการจอง (Booking ID)"] || "").toLowerCase();
-        const room = String(item["ห้องที่ขอใช้งาน"] || "").toLowerCase();
-        const dept = String(item["หน่วยงาน / ภาควิชา"] || "").toLowerCase();
-        const name = String(item["ชื่อผู้ติดต่อประสานงาน"] || "").toLowerCase();
+        const bookingId = String(getValue(item, ["รหัสการจอง (Booking ID)", "รหัสการจอง"])).toLowerCase();
+        const room = String(getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"])).toLowerCase();
+        const dept = String(getValue(item, ["หน่วยงาน / ภาควิชา", "หน่วยงาน"])).toLowerCase();
+        const name = String(getValue(item, ["ชื่อผู้ติดต่อประสานงาน", "ชื่อผู้ติดต่อ"])).toLowerCase();
 
         const matchKeyword = bookingId.includes(keyword) || room.includes(keyword) || dept.includes(keyword) || name.includes(keyword);
 
@@ -339,60 +419,83 @@
 
     function renderAdminTable(dataList) {
       const tbody = document.getElementById('adminTableBody');
-      if (dataList.length === 0) {
+      if (!dataList || dataList.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่พบคำขอที่ตรงตามเงื่อนไข</td></tr>';
         return;
       }
 
       let html = '';
       dataList.forEach((item, index) => {
-        const bookingId = item["รหัสการจอง (Booking ID)"];
-        const status = item["สถานะ"] || "รออนุมัติ";
+        const bookingId = getValue(item, ["รหัสการจอง (Booking ID)", "รหัสการจอง"]);
+        const status = getValue(item, ["สถานะ"], "รออนุมัติ");
 
         let statusBadge = '';
         if (status === 'อนุมัติ') {
-          statusBadge = '<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-xs font-semibold"><i class="fa-solid fa-circle-check mr-1"></i>อนุมัติแล้ว</span>';
+          statusBadge = '<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-xs font-semibold"><i class="fa-solid fa-circle-check mr-1"></i>อนุมัติสมบูรณ์</span>';
         } else if (status === 'ไม่อนุมัติ') {
           statusBadge = '<span class="bg-red-100 text-red-800 px-2.5 py-1 rounded-full text-xs font-semibold"><i class="fa-solid fa-circle-xmark mr-1"></i>ไม่อนุมัติ</span>';
+        } else if (status === 'รออนุมัติ (Header)') {
+          statusBadge = '<span class="bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full text-xs font-semibold"><i class="fa-solid fa-user-clock mr-1"></i>ผ่าน Admin (รอ Header)</span>';
         } else {
-          statusBadge = '<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-semibold"><i class="fa-solid fa-clock mr-1"></i>รออนุมัติ</span>';
+          statusBadge = '<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-semibold"><i class="fa-solid fa-clock mr-1"></i>รออนุมัติ (Admin)</span>';
         }
+
+        let canApprove = false;
+        if (userRole === "admin" && (status === "รออนุมัติ (Admin)" || status === "รออนุมัติ")) {
+          canApprove = true;
+        } else if (userRole === "header" && status === "รออนุมัติ (Header)") {
+          canApprove = true;
+        }
+
+        let actionButtons = '';
+        if (canApprove) {
+          actionButtons = `
+            <button id="btn-app-${index}" onclick="updateBookingStatus('btn-app-${index}', '${bookingId}', 'approve')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-xs font-medium transition flex items-center gap-1 shadow-sm">
+              <i class="fa-solid fa-check"></i> อนุมัติ
+            </button>
+            <button id="btn-rej-${index}" onclick="updateBookingStatus('btn-rej-${index}', '${bookingId}', 'reject')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs font-medium transition flex items-center gap-1 shadow-sm">
+              <i class="fa-solid fa-xmark"></i> ไม่อนุมัติ
+            </button>
+          `;
+        }
+
+        const editDeleteButtons = `
+          <button onclick="openEditModal(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-medium transition flex items-center gap-1 shadow-sm">
+            <i class="fa-solid fa-pen-to-square"></i> แก้ไข
+          </button>
+          <button onclick="deleteBooking('${bookingId}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-medium transition flex items-center gap-1 shadow-sm">
+            <i class="fa-solid fa-trash-can"></i> ลบ
+          </button>
+        `;
+
+        const room = getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"]);
+        const purpose = getValue(item, ["วัตถุประสงค์", "วัตถุประสงค์การใช้"]);
+        const startTime = getValue(item, ["เวลาเริ่มใช้งาน", "เวลาเริ่ม"]);
+        const endTime = getValue(item, ["เวลาสิ้นสุดใช้งาน", "เวลาสิ้นสุด"]);
+        const contactName = getValue(item, ["ชื่อผู้ติดต่อประสานงาน", "ชื่อผู้ติดต่อ"]);
+        const dept = getValue(item, ["หน่วยงาน / ภาควิชา", "หน่วยงาน"]);
 
         html += `
           <tr class="hover:bg-slate-50 transition">
-            <td class="py-3 px-3 font-mono font-bold text-gray-800 whitespace-nowrap">
-              ${bookingId}
-            </td>
+            <td class="py-3 px-3 font-mono font-bold text-gray-800 whitespace-nowrap">${bookingId}</td>
             <td class="py-3 px-3 whitespace-nowrap">
-              <span class="bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded-md text-xs">
-                ${item["ห้องที่ขอใช้งาน"] || '-'}
-              </span>
+              <span class="bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded-md text-xs">${room}</span>
             </td>
             <td class="py-3 px-3">
-              <div class="font-medium text-gray-800">${item["วัตถุประสงค์"] || '-'}</div>
+              <div class="font-medium text-gray-800">${purpose}</div>
               <div class="text-[11px] text-gray-500 mt-0.5">
-                <i class="fa-regular fa-clock text-emerald-600 mr-1"></i>${item["เวลาเริ่มใช้งาน"]} ถึง ${item["เวลาสิ้นสุดใช้งาน"]}
-                <span class="ml-2 font-medium">(${item["จำนวนผู้เข้าใช้งาน"] || 0} คน)</span>
+                <i class="fa-regular fa-clock text-emerald-600 mr-1"></i>${startTime} ถึง ${endTime}
               </div>
             </td>
             <td class="py-3 px-3 whitespace-nowrap">
-              <div class="font-medium text-gray-800">${item["ชื่อผู้ติดต่อประสานงาน"] || '-'}</div>
-              <div class="text-[11px] text-gray-500">${item["หน่วยงาน / ภาควิชา"]} | Tel: ${item["เบอร์โทรศัพท์"]}</div>
+              <div class="font-medium text-gray-800">${contactName}</div>
+              <div class="text-[11px] text-gray-500">${dept}</div>
             </td>
+            <td class="py-3 px-3 text-center whitespace-nowrap">${statusBadge}</td>
             <td class="py-3 px-3 text-center whitespace-nowrap">
-              ${statusBadge}
-            </td>
-            <td class="py-3 px-3 text-center whitespace-nowrap">
-              <div class="flex items-center justify-center gap-1.5">
-                <button id="btn-app-${index}" onclick="updateBookingStatus('btn-app-${index}', '${bookingId}', 'อนุมัติ')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-medium transition flex items-center gap-1 shadow-sm disabled:opacity-50">
-                  <i class="fa-solid fa-check"></i> อนุมัติ
-                </button>
-                <button id="btn-rej-${index}" onclick="updateBookingStatus('btn-rej-${index}', '${bookingId}', 'ไม่อนุมัติ')" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded text-xs font-medium transition flex items-center gap-1 shadow-sm disabled:opacity-50">
-                  <i class="fa-solid fa-xmark"></i> ไม่อนุมัติ
-                </button>
-                <button id="btn-del-${index}" onclick="deleteBooking('btn-del-${index}', '${bookingId}')" class="bg-gray-200 hover:bg-red-600 text-gray-600 hover:text-white px-2 py-1 rounded text-xs font-medium transition flex items-center gap-1 shadow-sm disabled:opacity-50" title="ลบรายการคำขอนี้">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
+              <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                ${actionButtons}
+                ${editDeleteButtons}
               </div>
             </td>
           </tr>
@@ -402,54 +505,106 @@
       tbody.innerHTML = html;
     }
 
-    // ฟังก์ชันอัปเดตสถานะ
-    async function updateBookingStatus(buttonId, bookingId, newStatus) {
-      if (!confirm(`คุณต้องการเปลี่ยนสถานะของคำขอ ${bookingId} เป็น "${newStatus}" ใช่หรือไม่?`)) {
-        return;
-      }
+    function openEditModal(index) {
+      const item = rawAdminData[index];
+      if (!item) return;
 
-      const btnElement = document.getElementById(buttonId);
-      if (btnElement) {
-        btnElement.disabled = true;
-        btnElement.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> บันทึก...';
-      }
+      const bookingId = getValue(item, ["รหัสการจอง (Booking ID)", "รหัสการจอง"]);
+      document.getElementById('editBookingId').value = bookingId;
+      document.getElementById('displayBookingId').value = bookingId;
+      document.getElementById('editRoom').value = getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"]);
+      document.getElementById('editAttendees').value = getValue(item, ["จำนวนผู้เข้าใช้งาน", "จำนวนผู้เข้าร่วม"]);
+      document.getElementById('editDept').value = getValue(item, ["หน่วยงาน / ภาควิชา", "หน่วยงาน"]);
+      document.getElementById('editContactName').value = getValue(item, ["ชื่อผู้ติดต่อประสานงาน", "ชื่อผู้ติดต่อ"]);
+      document.getElementById('editPhone').value = getValue(item, ["เบอร์โทรศัพท์", "เบอร์โทร"]);
+      document.getElementById('editPurpose').value = getValue(item, ["วัตถุประสงค์", "วัตถุประสงค์การใช้"]);
+      document.getElementById('editStartTime').value = getValue(item, ["เวลาเริ่มใช้งาน", "เวลาเริ่ม"]);
+      document.getElementById('editEndTime').value = getValue(item, ["เวลาสิ้นสุดใช้งาน", "เวลาสิ้นสุด"]);
+
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+
+    async function saveEditBooking(e) {
+      e.preventDefault();
+
+      const btn = document.getElementById('saveEditBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> กำลังบันทึก...';
+
+      const bookingId = document.getElementById('editBookingId').value;
+
+      const payload = {
+        action: "updateBooking",
+        bookingId: bookingId,
+        data: {
+          "ห้องที่ขอใช้งาน": document.getElementById('editRoom').value.trim(),
+          "จำนวนผู้เข้าใช้งาน": document.getElementById('editAttendees').value.trim(),
+          "หน่วยงาน / ภาควิชา": document.getElementById('editDept').value.trim(),
+          "ชื่อผู้ติดต่อประสานงาน": document.getElementById('editContactName').value.trim(),
+          "เบอร์โทรศัพท์": document.getElementById('editPhone').value.trim(),
+          "วัตถุประสงค์": document.getElementById('editPurpose').value.trim(),
+          "เวลาเริ่มใช้งาน": document.getElementById('editStartTime').value.trim(),
+          "เวลาสิ้นสุดใช้งาน": document.getElementById('editEndTime').value.trim()
+        }
+      };
 
       try {
-        const keyName = encodeURIComponent("รหัสการจอง (Booking ID)");
-        const keyValue = encodeURIComponent(bookingId);
-        const url = `${SHEETDB_API_URL}/${keyName}/${keyValue}`;
-
-        const response = await fetch(url, {
-          method: "PATCH",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            "data": {
-              "สถานะ": newStatus
-            }
-          })
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
         });
 
-        if (response.ok) {
-          alert(`อัปเดตสถานะคำขอ ${bookingId} เป็น "${newStatus}" เรียบร้อยแล้ว`);
+        const resData = await response.json();
+
+        if (resData.status === "success") {
+          alert("แก้ไขข้อมูลรายการจองเรียบร้อยแล้ว");
+          closeEditModal();
           loadAdminData();
         } else {
-          alert("เกิดข้อผิดพลาดในการอัปเดตสถานะ กรุณาลองใหม่อีกครั้ง");
-          if (btnElement) btnElement.disabled = false;
+          alert("เกิดข้อผิดพลาด: " + resData.message);
         }
-      } catch (error) {
-        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ: " + error.message);
-        if (btnElement) btnElement.disabled = false;
+      } catch (err) {
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'บันทึกข้อมูล';
       }
     }
 
-    // 🗑️ ฟังก์ชันลบรายการคำขอจอง
-    async function deleteBooking(buttonId, bookingId) {
-      if (!confirm(`⚠️ ยืนยันการลบคำขอรหัส: ${bookingId} ?\n\nการลบนี้จะลบข้อมูลออกจากระบบ Google Sheets อย่างถาวร`)) {
-        return;
+    async function deleteBooking(bookingId) {
+      if (!confirm(`คุณแน่ใจหรือว่าต้องการลบรายการจองรหัส ${bookingId} ?\n\n* การดำเนินการนี้ไม่สามารถยกเลิกได้`)) return;
+
+      try {
+        const payload = {
+          action: "deleteBooking",
+          bookingId: bookingId
+        };
+
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        const resData = await response.json();
+
+        if (resData.status === "success") {
+          alert("ลบรายการจองเรียบร้อยแล้ว");
+          loadAdminData();
+        } else {
+          alert("เกิดข้อผิดพลาด: " + resData.message);
+        }
+      } catch (err) {
+        alert("เกิดข้อผิดพลาดในการลบรายการ: " + err.message);
       }
+    }
+
+    async function updateBookingStatus(buttonId, bookingId, actionType) {
+      const confirmText = actionType === "approve" ? "อนุมัติคำขอนี้" : "ปฏิเสธคำขอนี้";
+      if (!confirm(`คุณต้องการ ${confirmText} ใช่หรือไม่?`)) return;
 
       const btnElement = document.getElementById(buttonId);
       if (btnElement) {
@@ -458,23 +613,25 @@
       }
 
       try {
-        const keyName = encodeURIComponent("รหัสการจอง (Booking ID)");
-        const keyValue = encodeURIComponent(bookingId);
-        const url = `${SHEETDB_API_URL}/${keyName}/${keyValue}`;
+        const payload = {
+          action: "updateStatus",
+          bookingId: bookingId,
+          role: userRole,
+          actionType: actionType
+        };
 
-        const response = await fetch(url, {
-          method: "DELETE",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-          }
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
         });
 
-        if (response.ok) {
-          alert(`ลบคำขอรหัส ${bookingId} เรียบร้อยแล้ว`);
-          loadAdminData(); // รีโหลดตารางข้อมูลใหม่
+        const resData = await response.json();
+
+        if (resData.status === "success") {
+          alert(resData.message);
+          loadAdminData();
         } else {
-          alert("เกิดข้อผิดพลาดในการลบคำขอ กรุณาตรวจสอบสิทธิ์ของ SheetDB API");
+          alert("เกิดข้อผิดพลาด: " + (resData.message || "กรุณาลองใหม่อีกครั้ง"));
           if (btnElement) btnElement.disabled = false;
         }
       } catch (error) {
