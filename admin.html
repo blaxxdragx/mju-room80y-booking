@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ระบบตรวจสอบและอนุมัติการจองห้อง - อาคารเรียนรวม 80 ปี</title>
+  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -16,14 +18,16 @@
   </style>
 
   <script>
+    // ตรวจสอบการเข้าสู่ระบบ
     if (sessionStorage.getItem("isAdminLoggedIn") !== "true") {
       alert("กรุณาเข้าสู่ระบบก่อนใช้งาน");
-      window.location.href = "login.html";
+      window.location.replace("login.html");
     }
   </script>
 </head>
 <body class="bg-slate-100 min-h-screen flex flex-col">
 
+  <!-- Header -->
   <header class="bg-[#0f2c23] text-white px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center shadow-lg gap-3">
     <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
       <div class="flex items-center gap-3">
@@ -53,6 +57,7 @@
     </div>
   </header>
 
+  <!-- Main Content -->
   <main class="max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 flex-1">
     
     <!-- KPI Cards -->
@@ -62,7 +67,7 @@
           <p class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1">คำขอทั้งหมด</p>
           <p id="kpiTotal" class="text-2xl sm:text-3xl font-bold text-gray-800">0</p>
         </div>
-        <div class="bg-indigo-50 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl text-indigo-600"><i class="fa-solid fa-file-invoice text-xl sm:text-2xl"></i></div>
+        <div class="bg-indigo-50 p-2.5 sm:p-3.5 rounded-xl text-indigo-600"><i class="fa-solid fa-file-invoice text-xl sm:text-2xl"></i></div>
       </div>
 
       <div class="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
@@ -70,7 +75,7 @@
           <p class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1">รอการอนุมัติของคุณ</p>
           <p id="kpiPendingRole" class="text-2xl sm:text-3xl font-bold text-amber-500">0</p>
         </div>
-        <div class="bg-amber-50 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl text-amber-500"><i class="fa-solid fa-clock-rotate-left text-xl sm:text-2xl"></i></div>
+        <div class="bg-amber-50 p-2.5 sm:p-3.5 rounded-xl text-amber-500"><i class="fa-solid fa-clock-rotate-left text-xl sm:text-2xl"></i></div>
       </div>
 
       <div class="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
@@ -78,7 +83,7 @@
           <p class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1">อนุมัติแล้ว</p>
           <p id="kpiApproved" class="text-2xl sm:text-3xl font-bold text-emerald-600">0</p>
         </div>
-        <div class="bg-emerald-50 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl text-emerald-600"><i class="fa-solid fa-calendar-check text-xl sm:text-2xl"></i></div>
+        <div class="bg-emerald-50 p-2.5 sm:p-3.5 rounded-xl text-emerald-600"><i class="fa-solid fa-calendar-check text-xl sm:text-2xl"></i></div>
       </div>
 
       <div class="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
@@ -86,38 +91,33 @@
           <p class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1">ผู้ร่วมงานรวม</p>
           <p id="kpiAttendees" class="text-2xl sm:text-3xl font-bold text-purple-600">0</p>
         </div>
-        <div class="bg-purple-50 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl text-purple-600"><i class="fa-solid fa-user-group text-xl sm:text-2xl"></i></div>
+        <div class="bg-purple-50 p-2.5 sm:p-3.5 rounded-xl text-purple-600"><i class="fa-solid fa-user-group text-xl sm:text-2xl"></i></div>
       </div>
     </div>
 
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
       <div class="lg:col-span-7 bg-white p-4 sm:p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
-        <div>
-          <h3 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-2">
-            <i class="fa-solid fa-chart-simple text-indigo-500"></i> สถิติจำนวนการใช้งานห้องเรียนยอดนิยม
-          </h3>
-        </div>
+        <h3 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-2">
+          <i class="fa-solid fa-chart-simple text-indigo-500"></i> สถิติจำนวนการใช้งานห้องเรียนยอดนิยม
+        </h3>
         <div class="h-56 sm:h-64 relative">
           <canvas id="popularRoomsChart"></canvas>
         </div>
       </div>
 
       <div class="lg:col-span-5 bg-white p-4 sm:p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
-        <div>
-          <h3 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-2">
-            <i class="fa-solid fa-chart-pie text-emerald-500"></i> สัดส่วนการจองแยกตามหน่วยงาน
-          </h3>
-        </div>
+        <h3 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-emerald-500"></i> สัดส่วนการจองแยกตามหน่วยงาน
+        </h3>
         <div class="h-56 sm:h-64 relative flex items-center justify-center">
           <canvas id="departmentShareChart"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- Management Table Section -->
+    <!-- Table Section -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 space-y-4">
-      
       <div class="flex flex-col md:flex-row justify-between md:items-center gap-3 border-b pb-4">
         <div>
           <h2 class="text-sm sm:text-base font-bold text-gray-800 leading-snug flex items-center gap-2">
@@ -146,7 +146,6 @@
         </div>
       </div>
 
-      <!-- Responsive Table with Touch Scroll -->
       <div class="overflow-x-auto -mx-4 sm:mx-0">
         <div class="inline-block min-w-full align-middle px-4 sm:px-0">
           <table class="w-full text-left border-collapse text-xs sm:text-sm">
@@ -157,7 +156,7 @@
                 <th class="py-3 px-3 font-medium min-w-[180px]">วัตถุประสงค์ & ช่วงเวลา</th>
                 <th class="py-3 px-3 font-medium whitespace-nowrap">ผู้ติดต่อ / หน่วยงาน</th>
                 <th class="py-3 px-3 font-medium text-center whitespace-nowrap">สถานะ</th>
-                <th class="py-3 px-3 font-medium text-center whitespace-nowrap">จัดการ</th>
+                <th class="py-3 px-3 font-medium text-center whitespace-nowrap">การจัดการ / ขั้นตอน</th>
               </tr>
             </thead>
             <tbody id="adminTableBody" class="divide-y divide-gray-100 text-gray-700">
@@ -170,12 +169,27 @@
           </table>
         </div>
       </div>
-
     </div>
 
   </main>
 
-  <!-- Edit Modal (Responsive) -->
+  <!-- Detail Modal -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-100 max-h-[90vh] flex flex-col">
+      <div class="bg-[#0f2c23] text-white px-4 sm:px-5 py-3.5 flex justify-between items-center shrink-0">
+        <h3 class="font-bold text-sm sm:text-base flex items-center gap-2"><i class="fa-solid fa-circle-info text-amber-400"></i> รายละเอียดคำขอและขั้นตอนการอนุมัติ</h3>
+        <button onclick="closeDetailModal()" class="text-gray-300 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1 text-xs sm:text-sm text-gray-700" id="modalDetailContent"></div>
+
+      <div class="p-3 sm:p-4 bg-gray-50 border-t flex justify-end shrink-0">
+        <button onclick="closeDetailModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium text-xs sm:text-sm transition">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
   <div id="editModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100 max-h-[90vh] flex flex-col">
       <div class="bg-[#0f2c23] text-white px-4 sm:px-5 py-3.5 flex justify-between items-center shrink-0">
@@ -185,12 +199,10 @@
 
       <form id="editForm" onsubmit="saveEditBooking(event)" class="p-4 sm:p-5 space-y-3 text-xs sm:text-sm overflow-y-auto flex-1">
         <input type="hidden" id="editBookingId">
-        
         <div>
           <label class="block font-medium text-gray-700 mb-1">รหัสการจอง</label>
           <input type="text" id="displayBookingId" disabled class="w-full px-3 py-2 bg-gray-100 border rounded font-mono font-bold text-emerald-800">
         </div>
-
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div>
             <label class="block font-medium text-gray-700 mb-1">ห้องที่ขอใช้งาน</label>
@@ -201,12 +213,10 @@
             <input type="number" id="editAttendees" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
           </div>
         </div>
-
         <div>
           <label class="block font-medium text-gray-700 mb-1">หน่วยงาน / ภาควิชา</label>
           <input type="text" id="editDept" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
         </div>
-
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div>
             <label class="block font-medium text-gray-700 mb-1">ชื่อผู้ติดต่อ</label>
@@ -217,12 +227,10 @@
             <input type="text" id="editPhone" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
           </div>
         </div>
-
         <div>
           <label class="block font-medium text-gray-700 mb-1">วัตถุประสงค์</label>
           <textarea id="editPurpose" rows="2" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
         </div>
-
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div>
             <label class="block font-medium text-gray-700 mb-1">เวลาเริ่มใช้งาน</label>
@@ -233,7 +241,6 @@
             <input type="text" id="editEndTime" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none">
           </div>
         </div>
-
         <div class="pt-3 border-t flex justify-end gap-2 shrink-0">
           <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg">ยกเลิก</button>
           <button type="submit" id="saveEditBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow">บันทึกข้อมูล</button>
@@ -242,6 +249,7 @@
     </div>
   </div>
 
+  <!-- Footer -->
   <footer class="bg-[#0f2c23] text-gray-300 text-xs py-6 mt-auto border-t border-emerald-900">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
       <div>
@@ -266,19 +274,26 @@
       const adminName = sessionStorage.getItem("adminUser") || "ผู้ใช้งาน";
       document.getElementById("adminNameDisplay").innerText = adminName;
       document.getElementById("roleBadge").innerText = userRole.toUpperCase();
-
-      const roleDesc = userRole === "admin" 
-        ? "แสดงสิทธิ์ Admin: ตรวจสอบและอนุมัติขั้นที่ 1" 
-        : "แสดงสิทธิ์ Header: ตรวจสอบและอนุมัติขั้นสุดท้าย";
-      document.getElementById("roleDescription").innerText = roleDesc;
-
+      document.getElementById("roleDescription").innerText = userRole === "admin" ? "แสดงสิทธิ์ Admin: ตรวจสอบและอนุมัติขั้นที่ 1" : "แสดงสิทธิ์ Header: อนุมัติขั้นสุดท้าย";
       loadAdminData();
     });
+
+    function formatDisplayDate(dateStr) {
+      if (!dateStr) return "-";
+      let str = String(dateStr).trim();
+      if (str.includes("T") && (str.includes("Z") || str.includes("+"))) {
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) {
+          return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+      }
+      return str;
+    }
 
     function logout() {
       if (confirm("คุณต้องการออกจากระบบหรือไม่?")) {
         sessionStorage.clear();
-        window.location.href = "index.html";
+        window.location.replace("index.html");
       }
     }
 
@@ -297,8 +312,10 @@
 
       try {
         const response = await fetch(API_URL);
-        const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
+        const result = await response.json();
+        const data = Array.isArray(result) ? result : [result];
+
+        if (data.length > 0 && data[0] !== null) {
           rawAdminData = [...data].reverse();
           updateKPIs(data);
           renderCharts(data);
@@ -307,6 +324,7 @@
           tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ยังไม่มีข้อมูลในระบบ</td></tr>';
         }
       } catch (error) {
+        console.error("Load admin data error:", error);
         tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-400">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
       }
     }
@@ -314,6 +332,7 @@
     function updateKPIs(data) {
       let approvedCount = 0, pendingRoleCount = 0, totalAttendees = 0;
       data.forEach(item => {
+        if (!item) return;
         const status = String(getValue(item, ["สถานะ"], "รออนุมัติ")).trim();
         if (status === "อนุมัติ") approvedCount++;
         if (userRole === "admin" && (status === "รออนุมัติ (Admin)" || status === "รออนุมัติ")) pendingRoleCount++;
@@ -330,6 +349,7 @@
     function renderCharts(data) {
       const roomCounts = {}, deptCounts = {};
       data.forEach(item => {
+        if (!item) return;
         const room = getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"], "ไม่ระบุ");
         const dept = getValue(item, ["หน่วยงาน / ภาควิชา", "หน่วยงาน"], "อื่นๆ");
         roomCounts[room] = (roomCounts[room] || 0) + 1;
@@ -355,6 +375,7 @@
       const statusFilter = document.getElementById('statusFilter').value;
       const keyword = document.getElementById('adminSearchInput').value.trim().toLowerCase();
       const filtered = rawAdminData.filter(item => {
+        if (!item) return false;
         const status = getValue(item, ["สถานะ"], "รออนุมัติ");
         let matchStatus = statusFilter === 'ALL' || (statusFilter === 'รออนุมัติ (Admin)' && (status === 'รออนุมัติ (Admin)' || status === 'รออนุมัติ')) || status === statusFilter;
         const bookingId = String(getValue(item, ["รหัสการจอง (Booking ID)", "รหัสการจอง"])).toLowerCase();
@@ -364,6 +385,119 @@
         return matchStatus && (bookingId.includes(keyword) || room.includes(keyword) || dept.includes(keyword) || name.includes(keyword));
       });
       renderAdminTable(filtered);
+    }
+
+    // 🟢 ไทม์ไลน์สำหรับ Admin: 1. เจ้าหน้าที่กำลังตรวจสอบ | 2. ดำเนินการให้หัวหน้าอนุมัติ | 3. อนุมัติแล้ว
+    function renderStepTracker(status) {
+      const st = String(status || "").trim();
+      let step1 = "completed", step2 = "pending", step3 = "pending";
+
+      if (st === "ไม่อนุมัติ") {
+        return `<div class="bg-red-50 border border-red-200 p-3 rounded-lg text-red-700 text-center font-medium"><i class="fa-solid fa-circle-xmark mr-1 text-base"></i> คำขอนี้ไม่ได้รับการอนุมัติ</div>`;
+      }
+
+      if (st === "รออนุมัติ (Admin)" || st === "รออนุมัติ") {
+        step1 = "current"; step2 = "pending"; step3 = "pending";
+      } else if (st === "รออนุมัติ (Header)") {
+        step1 = "completed"; step2 = "current"; step3 = "pending";
+      } else if (st === "อนุมัติ") {
+        step1 = "completed"; step2 = "completed"; step3 = "completed";
+      }
+
+      const getStepClass = (state) => {
+        if (state === "completed") return "bg-emerald-600 text-white border-emerald-600";
+        if (state === "current") return "bg-amber-500 text-slate-900 border-amber-500 animate-pulse font-bold";
+        return "bg-gray-200 text-gray-500 border-gray-300";
+      };
+
+      return `
+        <div class="bg-slate-50 p-4 rounded-xl border border-gray-200 space-y-3">
+          <p class="font-bold text-gray-800 text-xs sm:text-sm flex items-center gap-1.5"><i class="fa-solid fa-route text-emerald-700"></i> ขั้นตอนการพิจารณาคำขอจอง</p>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs border ${getStepClass(step1)}">1</div>
+              <span class="text-[11px] font-medium text-gray-700 mt-1">1. เจ้าหน้าที่กำลังตรวจสอบ</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs border ${getStepClass(step2)}">2</div>
+              <span class="text-[11px] font-medium text-gray-700 mt-1">2. ดำเนินการให้หัวหน้าอนุมัติ</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs border ${getStepClass(step3)}">3</div>
+              <span class="text-[11px] font-medium text-gray-700 mt-1">3. อนุมัติแล้ว</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function openDetailModalFromItem(item) {
+      const bookingId = getValue(item, ["รหัสการจอง (Booking ID)", "รหัสการจอง"]);
+      const status = getValue(item, ["สถานะ"], "รออนุมัติ");
+      const startTime = formatDisplayDate(getValue(item, ["เวลาเริ่มใช้งาน", "เวลาเริ่ม"]));
+      const endTime = formatDisplayDate(getValue(item, ["เวลาสิ้นสุดใช้งาน", "เวลาสิ้นสุด"]));
+      const room = getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"]);
+      const purpose = getValue(item, ["วัตถุประสงค์", "วัตถุประสงค์การใช้"]);
+      const attendees = getValue(item, ["จำนวนผู้เข้าใช้งาน", "จำนวนผู้เข้าร่วม"], "-");
+      const dept = getValue(item, ["หน่วยงาน / ภาควิชา", "หน่วยงาน"]);
+      const contactName = getValue(item, ["ชื่อผู้ติดต่อประสานงาน", "ชื่อผู้ติดต่อ"]);
+      const phone = getValue(item, ["เบอร์โทรศัพท์", "เบอร์โทร"]);
+      const email = getValue(item, ["อีเมลผู้ประสานงาน", "อีเมล"]);
+      const reqDate = getValue(item, ["วันเวลาที่ส่งคำขอ"], "-");
+
+      let noticeBox = status === "อนุมัติ" ? `
+        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-4 sm:p-5 rounded-xl shadow-lg border-2 border-emerald-400 flex items-center gap-3 sm:gap-4 my-2">
+          <div class="bg-white/20 p-2.5 sm:p-3 rounded-full text-white shrink-0 flex items-center justify-center">
+            <i class="fa-solid fa-circle-check text-2xl sm:text-3xl text-emerald-100"></i>
+          </div>
+          <div>
+            <h4 class="text-base sm:text-lg font-bold leading-tight drop-shadow-sm">
+              🎉 การจองผ่านการอนุมัติสมบูรณ์แล้ว!
+            </h4>
+            <p class="text-xs sm:text-sm text-emerald-50 mt-1 font-medium leading-relaxed">
+              รบกวนส่งหนังสือขอความอนุเคราะห์เข้ามาที่ <span class="bg-white/20 px-1.5 py-0.5 rounded font-bold underline">สำนักบริหาร</span> ขอบพระคุณมากครับ
+            </p>
+          </div>
+        </div>` : "";
+
+      const contentHtml = `
+        ${renderStepTracker(status)}
+        ${noticeBox}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+          <div><p class="text-gray-400 text-[11px]">รหัสการจอง</p><p class="font-mono font-bold text-emerald-700">${bookingId}</p></div>
+          <div><p class="text-gray-400 text-[11px]">สถานะปัจจุบัน</p><div class="mt-0.5">${getBadgeHtml(status)}</div></div>
+          <div><p class="text-gray-400 text-[11px]">ห้องที่ขอใช้งาน</p><p class="font-semibold text-gray-800">${room}</p></div>
+          <div><p class="text-gray-400 text-[11px]">จำนวนผู้เข้าใช้งาน</p><p class="font-semibold text-gray-800">${attendees} ท่าน</p></div>
+          <div class="sm:col-span-2"><p class="text-gray-400 text-[11px]">วัตถุประสงค์ / โครงการ</p><p class="font-semibold text-gray-800">${purpose}</p></div>
+          <div><p class="text-gray-400 text-[11px]">เวลาเริ่มต้น</p><p class="font-semibold text-gray-800">${startTime}</p></div>
+          <div><p class="text-gray-400 text-[11px]">เวลาสิ้นสุด</p><p class="font-semibold text-gray-800">${endTime}</p></div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-2">
+          <p class="font-bold text-gray-800 text-xs border-pb pb-1"><i class="fa-solid fa-address-book text-emerald-700 mr-1"></i> ข้อมูลผู้ติดต่อประสานงาน</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <p><strong>ชื่อ-นามสกุล:</strong> ${contactName}</p>
+            <p><strong>หน่วยงาน:</strong> ${dept}</p>
+            <p><strong>เบอร์โทรศัพท์:</strong> ${phone}</p>
+            <p><strong>อีเมล:</strong> ${email}</p>
+            <p class="sm:col-span-2 text-gray-400 text-[11px]">ส่งคำขอเมื่อ: ${reqDate}</p>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('modalDetailContent').innerHTML = contentHtml;
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    function getBadgeHtml(status) {
+      const st = String(status || "").trim();
+      if (st === 'อนุมัติ') return '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap"><i class="fa-solid fa-circle-check"></i> อนุมัติแล้ว</span>';
+      if (st === 'ไม่อนุมัติ') return '<span class="bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap"><i class="fa-solid fa-circle-xmark"></i> ไม่อนุมัติ</span>';
+      if (st === 'รออนุมัติ (Header)') return '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap"><i class="fa-solid fa-user-clock"></i> รอ Header</span>';
+      return '<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap"><i class="fa-solid fa-clock"></i> รอ Admin</span>';
     }
 
     function renderAdminTable(dataList) {
@@ -377,20 +511,17 @@
       dataList.forEach((item, index) => {
         const bookingId = getValue(item, ["รหัสการจอง (Booking ID)", "รหัสการจอง"]);
         const status = getValue(item, ["สถานะ"], "รออนุมัติ");
-        let statusBadge = status === 'อนุมัติ' ? '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap"><i class="fa-solid fa-circle-check"></i> อนุมัติแล้ว</span>' :
-                          status === 'ไม่อนุมัติ' ? '<span class="bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap"><i class="fa-solid fa-circle-xmark"></i> ไม่อนุมัติ</span>' :
-                          status === 'รออนุมัติ (Header)' ? '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap"><i class="fa-solid fa-user-clock"></i> รอ Header</span>' :
-                          '<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap"><i class="fa-solid fa-clock"></i> รอ Admin</span>';
-
         let canApprove = (userRole === "admin" && (status === "รออนุมัติ (Admin)" || status === "รออนุมัติ")) || (userRole === "header" && status === "รออนุมัติ (Header)");
+        
         let actionButtons = canApprove ? `
-          <button id="btn-app-${index}" onclick="updateBookingStatus('btn-app-${index}', '${bookingId}', 'approve')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-xs font-medium"><i class="fa-solid fa-check"></i></button>
-          <button id="btn-rej-${index}" onclick="updateBookingStatus('btn-rej-${index}', '${bookingId}', 'reject')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs font-medium"><i class="fa-solid fa-xmark"></i></button>
+          <button id="btn-app-${index}" onclick="updateBookingStatus('btn-app-${index}', '${bookingId}', 'approve')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-xs font-medium" title="อนุมัติ"><i class="fa-solid fa-check"></i></button>
+          <button id="btn-rej-${index}" onclick="updateBookingStatus('btn-rej-${index}', '${bookingId}', 'reject')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs font-medium" title="ไม่อนุมัติ"><i class="fa-solid fa-xmark"></i></button>
         ` : '';
 
+        const detailButton = `<button onclick='openDetailModalFromItem(${JSON.stringify(item)})' class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded text-xs font-medium" title="ดูรายละเอียด & ขั้นตอน"><i class="fa-solid fa-eye"></i></button>`;
         const editDeleteButtons = `
-          <button onclick="openEditModal(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-medium"><i class="fa-solid fa-pen"></i></button>
-          <button onclick="deleteBooking('${bookingId}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-medium"><i class="fa-solid fa-trash"></i></button>
+          <button onclick="openEditModal(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-medium" title="แก้ไข"><i class="fa-solid fa-pen"></i></button>
+          <button onclick="deleteBooking('${bookingId}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-medium" title="ลบ"><i class="fa-solid fa-trash"></i></button>
         `;
 
         html += `
@@ -399,15 +530,15 @@
             <td class="py-3 px-3 whitespace-nowrap"><span class="bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded text-xs">${getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"])}</span></td>
             <td class="py-3 px-3">
               <div class="font-medium text-gray-800">${getValue(item, ["วัตถุประสงค์", "วัตถุประสงค์การใช้"])}</div>
-              <div class="text-[11px] text-gray-500"><i class="fa-regular fa-clock mr-1"></i>${getValue(item, ["เวลาเริ่มใช้งาน", "เวลาเริ่ม"])}</div>
+              <div class="text-[11px] text-gray-500"><i class="fa-regular fa-clock mr-1"></i>${formatDisplayDate(getValue(item, ["เวลาเริ่มใช้งาน", "เวลาเริ่ม"]))}</div>
             </td>
             <td class="py-3 px-3 whitespace-nowrap">
               <div class="font-medium text-gray-800">${getValue(item, ["ชื่อผู้ติดต่อประสานงาน", "ชื่อผู้ติดต่อ"])}</div>
               <div class="text-[11px] text-gray-500">${getValue(item, ["หน่วยงาน / ภาควิชา", "หน่วยงาน"])}</div>
             </td>
-            <td class="py-3 px-3 text-center whitespace-nowrap">${statusBadge}</td>
+            <td class="py-3 px-3 text-center whitespace-nowrap">${getBadgeHtml(status)}</td>
             <td class="py-3 px-3 text-center whitespace-nowrap">
-              <div class="flex items-center justify-center gap-1">${actionButtons} ${editDeleteButtons}</div>
+              <div class="flex items-center justify-center gap-1">${detailButton} ${actionButtons} ${editDeleteButtons}</div>
             </td>
           </tr>
         `;
@@ -438,7 +569,7 @@
       e.preventDefault();
       const btn = document.getElementById('saveEditBtn');
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> บันทึก...';
+      btn.innerHTML = 'กำลังบันทึก...';
       const bookingId = document.getElementById('editBookingId').value;
       const payload = {
         action: "updateBooking",
@@ -457,11 +588,8 @@
       try {
         const response = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
         const resData = await response.json();
-        if (resData.status === "success") {
-          alert("แก้ไขข้อมูลสำเร็จ");
-          closeEditModal();
-          loadAdminData();
-        } else { alert("เกิดข้อผิดพลาด: " + resData.message); }
+        if (resData.status === "success") { alert("แก้ไขสำเร็จ"); closeEditModal(); loadAdminData(); }
+        else { alert("เกิดข้อผิดพลาด: " + resData.message); }
       } catch (err) { alert("เกิดข้อผิดพลาด: " + err.message); }
       finally { btn.disabled = false; btn.innerHTML = 'บันทึกข้อมูล'; }
     }
@@ -471,13 +599,13 @@
       try {
         const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "deleteBooking", bookingId }) });
         const resData = await response.json();
-        if (resData.status === "success") { alert("ลบเรียบร้อย"); loadAdminData(); }
+        if (resData.status === "success") { alert("ลบสำเร็จ"); loadAdminData(); }
         else { alert("เกิดข้อผิดพลาด: " + resData.message); }
       } catch (err) { alert("เกิดข้อผิดพลาด: " + err.message); }
     }
 
     async function updateBookingStatus(buttonId, bookingId, actionType) {
-      if (!confirm(`ยืนยันการทำรายการ ${actionType === "approve" ? "อนุมัติ" : "ปฏิเสธ"} ?`)) return;
+      if (!confirm(`ยืนยันการทำรายการนี้ใช่หรือไม่?`)) return;
       const btn = document.getElementById(buttonId);
       if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i>'; }
       try {

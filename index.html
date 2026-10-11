@@ -14,7 +14,7 @@
 
   <style>
     body { font-family: 'Prompt', sans-serif; }
-    input, select, textarea { font-size: 16px !important; } /* ป้องกัน iOS ซูมจออัตโนมัติ */
+    input, select, textarea { font-size: 16px !important; }
     @media (max-width: 640px) {
       .calendar-container { height: 380px !important; }
     }
@@ -22,7 +22,6 @@
 </head>
 <body class="bg-slate-100 min-h-screen flex flex-col">
 
-  <!-- Header -->
   <header class="bg-[#0f2c23] text-white px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center shadow-lg gap-3">
     <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
       <div class="flex items-center gap-3">
@@ -50,12 +49,10 @@
     </div>
   </header>
 
-  <!-- Main Content -->
   <main class="max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 flex-1">
     
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
       
-      <!-- Calendar Section -->
       <div class="lg:col-span-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 flex flex-col">
         <div class="flex items-start gap-3 mb-3 sm:mb-4">
           <div class="bg-emerald-600 text-white p-2.5 rounded-lg flex items-center justify-center shadow-sm">
@@ -73,14 +70,8 @@
           <iframe src="https://calendar.google.com/calendar/embed?src=8rpbip07e0haaa3amumaq7203k%40group.calendar.google.com&ctz=Asia%2FBangkok" 
                   style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
         </div>
-        
-        <div class="mt-3 text-[11px] text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200 flex items-center gap-2">
-          <i class="fa-solid fa-circle-info text-amber-600 text-sm shrink-0"></i>
-          <span>คำขอใหม่จะแสดงในปฏิทินเมื่อผ่านการอนุมัติครบถ้วนแล้วเท่านั้น</span>
-        </div>
       </div>
 
-      <!-- Form & Status Section -->
       <div class="lg:col-span-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 flex flex-col">
         
         <div class="flex border-b border-gray-200 mb-4 sm:mb-5">
@@ -92,10 +83,8 @@
           </button>
         </div>
 
-        <!-- Form Tab -->
         <div id="tab-form-content" class="space-y-3 sm:space-y-4 text-xs sm:text-sm">
           <form id="bookingForm" onsubmit="handleFormSubmit(event)">
-            
             <div class="mb-3">
               <label class="block font-medium text-gray-700 mb-1">อีเมลผู้ประสานงาน <span class="text-red-500">*</span></label>
               <input type="email" id="email" required placeholder="example@mju.ac.th" class="w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
@@ -149,7 +138,6 @@
           </form>
         </div>
 
-        <!-- Status Tab -->
         <div id="tab-status-content" class="hidden space-y-4 text-xs sm:text-sm">
           <div class="bg-gray-50 p-3 sm:p-4 rounded-lg border">
             <label class="block font-medium text-gray-700 mb-1">ค้นหาคำขอจองห้องเรียน</label>
@@ -168,14 +156,13 @@
 
     </div>
 
-    <!-- Database Table Section -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 space-y-4">
       <div class="flex flex-col md:flex-row justify-between md:items-center gap-3 border-b pb-4">
         <div>
           <h2 class="text-sm sm:text-base font-bold text-gray-800 leading-snug flex items-center gap-2">
             <i class="fa-solid fa-database text-emerald-700"></i> ฐานข้อมูลรายละเอียดการจองห้องเรียนรวม
           </h2>
-          <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5">แสดงรายการคำขอทั้งหมดและสถานะการพิจารณา</p>
+          <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5">คลิกที่แถวรายการเพื่อดูรายละเอียดและขั้นตอนการอนุมัติ</p>
         </div>
 
         <div class="flex items-center gap-2 w-full md:w-auto">
@@ -189,7 +176,6 @@
         </div>
       </div>
 
-      <!-- Responsive Table with Touch Scroll -->
       <div class="overflow-x-auto -mx-4 sm:mx-0">
         <div class="inline-block min-w-full align-middle px-4 sm:px-0">
           <table class="w-full text-left border-collapse text-xs sm:text-sm">
@@ -218,7 +204,21 @@
 
   </main>
 
-  <!-- Footer -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-100 max-h-[90vh] flex flex-col">
+      <div class="bg-[#0f2c23] text-white px-4 sm:px-5 py-3.5 flex justify-between items-center shrink-0">
+        <h3 class="font-bold text-sm sm:text-base flex items-center gap-2"><i class="fa-solid fa-circle-info text-amber-400"></i> รายละเอียดคำขอจองห้องเรียน</h3>
+        <button onclick="closeDetailModal()" class="text-gray-300 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1 text-xs sm:text-sm text-gray-700" id="modalDetailContent"></div>
+
+      <div class="p-3 sm:p-4 bg-gray-50 border-t flex justify-end shrink-0">
+        <button onclick="closeDetailModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium text-xs sm:text-sm transition">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="bg-[#0f2c23] text-gray-300 text-xs py-6 mt-auto border-t border-emerald-900">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
       <div>
@@ -238,25 +238,26 @@
 
     document.addEventListener("DOMContentLoaded", function() {
       checkLoginStatus();
-
-      const pickerConfig = {
-        enableTime: true,
-        dateFormat: "d-m-Y H:i",
-        time_24hr: true,
-        minDate: "today",
-        locale: "th"
-      };
-
-      flatpickr("#startTime", pickerConfig);
-      flatpickr("#endTime", pickerConfig);
-
+      flatpickr("#startTime", { enableTime: true, dateFormat: "d-m-Y H:i", time_24hr: true, minDate: "today", locale: "th" });
+      flatpickr("#endTime", { enableTime: true, dateFormat: "d-m-Y H:i", time_24hr: true, minDate: "today", locale: "th" });
       fetchRecentBookings();
     });
+
+    function formatDisplayDate(dateStr) {
+      if (!dateStr) return "-";
+      let str = String(dateStr).trim();
+      if (str.includes("T") && (str.includes("Z") || str.includes("+"))) {
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) {
+          return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+      }
+      return str;
+    }
 
     function checkLoginStatus() {
       const isLoggedIn = sessionStorage.getItem("isAdminLoggedIn") === "true";
       const adminUser = sessionStorage.getItem("adminUser") || "ผู้ดูแลระบบ";
-      const userRole = sessionStorage.getItem("userRole") || "admin";
       const navSection = document.getElementById("authNavSection");
 
       if (isLoggedIn && navSection) {
@@ -289,7 +290,6 @@
       try {
         const response = await fetch(API_URL);
         const data = await response.json();
-
         if (Array.isArray(data) && data.length > 0) {
           allBookingsData = [...data].reverse();
           renderTable(allBookingsData);
@@ -323,6 +323,118 @@
       return fallback;
     }
 
+    // 🟢 ไทม์ไลน์สำหรับหน้าผู้ใช้ทั่วไป: 1. เจ้าหน้าที่กำลังตรวจสอบ | 2. กำลังดำเนินการตรวจสอบ | 3. อนุมัติแล้ว
+    function renderStepTracker(status) {
+      const st = String(status || "").trim();
+      let step1 = "completed", step2 = "pending", step3 = "pending";
+
+      if (st === "ไม่อนุมัติ") {
+        return `
+          <div class="bg-red-50 border border-red-200 p-3.5 rounded-xl text-red-700 text-center font-medium">
+            <i class="fa-solid fa-circle-xmark text-red-500 mr-1 text-base"></i> คำขอนี้ไม่ได้รับการอนุมัติ
+          </div>`;
+      }
+
+      if (st === "รออนุมัติ (Admin)" || st === "รออนุมัติ") {
+        step1 = "current"; step2 = "pending"; step3 = "pending";
+      } else if (st === "รออนุมัติ (Header)") {
+        step1 = "completed"; step2 = "current"; step3 = "pending";
+      } else if (st === "อนุมัติ") {
+        step1 = "completed"; step2 = "completed"; step3 = "completed";
+      }
+
+      const getStepClass = (state) => {
+        if (state === "completed") return "bg-emerald-600 text-white border-emerald-600";
+        if (state === "current") return "bg-amber-500 text-slate-900 border-amber-500 animate-pulse font-bold";
+        return "bg-gray-200 text-gray-500 border-gray-300";
+      };
+
+      return `
+        <div class="bg-slate-50 p-4 rounded-xl border border-gray-200 space-y-3">
+          <p class="font-bold text-gray-800 text-xs sm:text-sm flex items-center gap-1.5"><i class="fa-solid fa-route text-emerald-700"></i> ขั้นตอนการพิจารณาคำขอจอง</p>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs border ${getStepClass(step1)}">1</div>
+              <span class="text-[11px] font-medium text-gray-700 mt-1">1. เจ้าหน้าที่กำลังตรวจสอบ</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs border ${getStepClass(step2)}">2</div>
+              <span class="text-[11px] font-medium text-gray-700 mt-1">2. กำลังดำเนินการตรวจสอบ</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs border ${getStepClass(step3)}">3</div>
+              <span class="text-[11px] font-medium text-gray-700 mt-1">3. อนุมัติแล้ว</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function openDetailModalFromItem(item) {
+      const bookingId = getValue(item, ["รหัสการจอง (Booking ID)", "รหัสการจอง"]);
+      const status = getValue(item, ["สถานะ"], "รออนุมัติ");
+      const startTime = formatDisplayDate(getValue(item, ["เวลาเริ่มใช้งาน", "เวลาเริ่ม"]));
+      const endTime = formatDisplayDate(getValue(item, ["เวลาสิ้นสุดใช้งาน", "เวลาสิ้นสุด"]));
+      const room = getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"]);
+      const purpose = getValue(item, ["วัตถุประสงค์", "วัตถุประสงค์การใช้"]);
+      const attendees = getValue(item, ["จำนวนผู้เข้าใช้งาน", "จำนวนผู้เข้าร่วม"], "-");
+      const dept = getValue(item, ["หน่วยงาน / ภาควิชา", "หน่วยงาน"]);
+      const contactName = getValue(item, ["ชื่อผู้ติดต่อประสานงาน", "ชื่อผู้ติดต่อ"]);
+      const phone = getValue(item, ["เบอร์โทรศัพท์", "เบอร์โทร"]);
+      const email = getValue(item, ["อีเมลผู้ประสานงาน", "อีเมล"]);
+      const reqDate = getValue(item, ["วันเวลาที่ส่งคำขอ"], "-");
+
+      let noticeBox = "";
+      if (status === "อนุมัติ") {
+        noticeBox = `
+          <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-4 sm:p-5 rounded-xl shadow-lg border-2 border-emerald-400 flex items-center gap-3 sm:gap-4 my-2">
+            <div class="bg-white/20 p-2.5 sm:p-3 rounded-full text-white shrink-0 flex items-center justify-center">
+              <i class="fa-solid fa-circle-check text-2xl sm:text-3xl text-emerald-100"></i>
+            </div>
+            <div>
+              <h4 class="text-base sm:text-lg font-bold leading-tight drop-shadow-sm">
+                🎉 การจองของท่านผ่านการอนุมัติสมบูรณ์แล้ว!
+              </h4>
+              <p class="text-xs sm:text-sm text-emerald-50 mt-1 font-medium leading-relaxed">
+                รบกวนท่านส่งหนังสือขอความอนุเคราะห์เข้ามาที่ <span class="bg-white/20 px-1.5 py-0.5 rounded font-bold underline">สำนักบริหาร</span> ขอบพระคุณมากครับ
+              </p>
+            </div>
+          </div>`;
+      }
+
+      const contentHtml = `
+        ${renderStepTracker(status)}
+        ${noticeBox}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+          <div><p class="text-gray-400 text-[11px]">รหัสการจอง</p><p class="font-mono font-bold text-emerald-700">${bookingId}</p></div>
+          <div><p class="text-gray-400 text-[11px]">สถานะปัจจุบัน</p><div class="mt-0.5">${getBadgeHtml(status)}</div></div>
+          <div><p class="text-gray-400 text-[11px]">ห้องที่ขอใช้งาน</p><p class="font-semibold text-gray-800">${room}</p></div>
+          <div><p class="text-gray-400 text-[11px]">จำนวนผู้เข้าใช้งาน</p><p class="font-semibold text-gray-800">${attendees} ท่าน</p></div>
+          <div class="sm:col-span-2"><p class="text-gray-400 text-[11px]">วัตถุประสงค์ / โครงการ</p><p class="font-semibold text-gray-800">${purpose}</p></div>
+          <div><p class="text-gray-400 text-[11px]">เวลาเริ่มต้น</p><p class="font-semibold text-gray-800">${startTime}</p></div>
+          <div><p class="text-gray-400 text-[11px]">เวลาสิ้นสุด</p><p class="font-semibold text-gray-800">${endTime}</p></div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-2">
+          <p class="font-bold text-gray-800 text-xs border-pb pb-1"><i class="fa-solid fa-address-book text-emerald-700 mr-1"></i> ข้อมูลผู้ติดต่อประสานงาน</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <p><strong>ชื่อ-นามสกุล:</strong> ${contactName}</p>
+            <p><strong>หน่วยงาน:</strong> ${dept}</p>
+            <p><strong>เบอร์โทรศัพท์:</strong> ${phone}</p>
+            <p><strong>อีเมล:</strong> ${email}</p>
+            <p class="sm:col-span-2 text-gray-400 text-[11px]">ส่งคำขอเมื่อ: ${reqDate}</p>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('modalDetailContent').innerHTML = contentHtml;
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
     function renderTable(dataList) {
       const tbody = document.getElementById('bookingTableBody');
       if (!dataList || dataList.length === 0) {
@@ -332,8 +444,8 @@
 
       let html = '';
       dataList.forEach((item, index) => {
-        const startTime = getValue(item, ["เวลาเริ่มใช้งาน", "เวลาเริ่ม"]);
-        const endTime = getValue(item, ["เวลาสิ้นสุดใช้งาน", "เวลาสิ้นสุด"]);
+        const startTime = formatDisplayDate(getValue(item, ["เวลาเริ่มใช้งาน", "เวลาเริ่ม"]));
+        const endTime = formatDisplayDate(getValue(item, ["เวลาสิ้นสุดใช้งาน", "เวลาสิ้นสุด"]));
         const room = getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"]);
         const purpose = getValue(item, ["วัตถุประสงค์", "วัตถุประสงค์การใช้"]);
         const attendees = getValue(item, ["จำนวนผู้เข้าใช้งาน", "จำนวนผู้เข้าร่วม"], "");
@@ -341,10 +453,8 @@
         const contactName = getValue(item, ["ชื่อผู้ติดต่อประสานงาน", "ชื่อผู้ติดต่อ"], "");
         const status = getValue(item, ["สถานะ"], "รออนุมัติ");
 
-        const statusBadge = getBadgeHtml(status);
-
         html += `
-          <tr class="hover:bg-slate-50 transition">
+          <tr onclick='openDetailModalFromItem(${JSON.stringify(item)})' class="hover:bg-emerald-50/50 transition cursor-pointer" title="คลิกเพื่อดูรายละเอียด">
             <td class="py-3 px-2 text-center font-medium text-gray-400">${index + 1}</td>
             <td class="py-3 px-3 font-medium text-gray-800 whitespace-nowrap">
               <div class="text-xs">${startTime}</div>
@@ -369,7 +479,7 @@
               <div class="text-[11px] text-gray-400 font-normal">${contactName}</div>
             </td>
             <td class="py-3 px-3 text-center whitespace-nowrap">
-              ${statusBadge}
+              ${getBadgeHtml(status)}
             </td>
           </tr>
         `;
@@ -441,7 +551,6 @@
 
       const startTimeVal = document.getElementById('startTime').value;
       const endTimeVal = document.getElementById('endTime').value;
-
       const parseDate = (str) => {
         const [d, m, yTime] = str.split('-');
         const [y, time] = yTime.split(' ');
@@ -515,18 +624,18 @@
           });
 
           if (matches.length > 0) {
-            let html = `<p class="text-xs text-gray-500 mb-2">พบ <strong>${matches.length}</strong> รายการ</p>`;
+            let html = `<p class="text-xs text-gray-500 mb-2">พบ <strong>${matches.length}</strong> รายการ (คลิกที่การ์ดเพื่อดูรายละเอียด)</p>`;
             matches.forEach((item, index) => {
               const status = getValue(item, ["สถานะ"], "รออนุมัติ");
               const bookingId = getValue(item, ["รหัสการจอง (Booking ID)", "รหัสการจอง"]);
               html += `
-                <div class="border rounded-lg p-3 ${index > 0 ? 'mt-2' : ''} bg-slate-50 space-y-1">
+                <div onclick='openDetailModalFromItem(${JSON.stringify(item)})' class="border rounded-lg p-3.5 ${index > 0 ? 'mt-2.5' : ''} bg-slate-50 hover:bg-emerald-50/60 transition cursor-pointer space-y-1.5 shadow-sm">
                   <div class="flex justify-between items-center">
                     <span class="font-bold text-xs font-mono text-emerald-700">${bookingId}</span>
                     <div>${getBadgeHtml(status)}</div>
                   </div>
-                  <p class="text-xs"><strong>ห้อง:</strong> ${getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"])}</p>
-                  <p class="text-xs"><strong>ช่วงเวลา:</strong> ${getValue(item, ["เวลาเริ่มใช้งาน", "เวลาเริ่ม"])} ถึง ${getValue(item, ["เวลาสิ้นสุดใช้งาน", "เวลาสิ้นสุด"])}</p>
+                  <p class="text-xs"><strong>ห้อง:</strong> ${getValue(item, ["ห้องที่ขอใช้งาน", "ห้อง"])} | <strong>ผู้ติดต่อ:</strong> ${getValue(item, ["ชื่อผู้ติดต่อประสานงาน", "ชื่อผู้ติดต่อ"])}</p>
+                  <p class="text-xs text-gray-500"><strong>ช่วงเวลา:</strong> ${formatDisplayDate(getValue(item, ["เวลาเริ่มใช้งาน", "เวลาเริ่ม"]))} ถึง ${formatDisplayDate(getValue(item, ["เวลาสิ้นสุดใช้งาน", "เวลาสิ้นสุด"]))}</p>
                 </div>
               `;
             });
