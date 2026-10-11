@@ -98,9 +98,8 @@
 
       let isSuccess = false;
       let profileName = "";
-      let userRole = "admin"; // ค่าเริ่มต้นเป็น admin
+      let userRole = "admin";
 
-      // 1. ตรวจสอบข้อมูลจาก SheetDB API พร้อมรองรับทั้งรูปแบบ Array และ Object เดี่ยว
       for (const apiUrl of API_URLS) {
         try {
           const response = await fetch(apiUrl);
@@ -130,7 +129,6 @@
         }
       }
 
-      // 2. สำรองข้อมูลบัญชีฉุกเฉิน (Fallback Direct Login)
       if (!isSuccess) {
         if (usernameInput === "admin80y" && passwordInput === "admin80y") {
           isSuccess = true;
@@ -143,7 +141,6 @@
         }
       }
 
-      // 3. จัดการ Session และย้ายหน้าเมื่อสำเร็จ
       if (isSuccess) {
         showAlert(`เข้าสู่ระบบสำเร็จ กำลังนำคุณไปยังหน้าผู้ดูแลระบบ...`, 'success');
 
